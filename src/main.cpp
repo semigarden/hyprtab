@@ -16,7 +16,8 @@
 inline HANDLE PHANDLE = nullptr;
 inline CHyprSignalListener g_windowTitleListener;
 inline CHyprSignalListener g_windowOpenListener;
-inline std::string g_format = "{tab}";
+inline CHyprSignalListener g_configReloadedListener;
+inline std::string g_format = "{default}";
 
 static constexpr std::array<std::string_view, 3> SEPARATORS = {
     " - ",
@@ -121,6 +122,8 @@ static std::string formatTitle(const STitleParts& parts, PHLWINDOW window) {
 }
 
 static void loadConfig() {
+    g_format = "{default}";
+
     const char* home = std::getenv("HOME");
 
     if (!home)
@@ -218,14 +221,19 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
 
     g_windowTitleListener = Event::bus()->m_events.window.title.listen([](PHLWINDOW window) { rewriteTitle(window); });
     g_windowOpenListener  = Event::bus()->m_events.window.open.listen([](PHLWINDOW window) { rewriteTitle(window); });
+    g_configReloadedListener = Event::bus()->m_events.config.reloaded.listen([]() {
+        loadConfig();
+        rewriteExistingWindows();
+    });
 
     rewriteExistingWindows();
     HyprlandAPI::addNotification(PHANDLE, "[hyprtab] Loaded", CHyprColor{0.2, 0.8, 0.3, 1.0}, 2500);
 
-    return {"hyprtab", "Window title formatter", "hyprtab", "0.0.2"};
+    return {"hyprtab", "Format window/groupbar titles", "hyprtab", "0.0.3"};
 }
 
 APICALL EXPORT void PLUGIN_EXIT() {
     g_windowTitleListener.reset();
     g_windowOpenListener.reset();
+    g_configReloadedListener.reset();
 }

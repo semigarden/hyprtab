@@ -3,7 +3,7 @@ name = "hyprtab"
 authors = ["semigarden"]
 
 [hyprtab]
-description = "Format window titles"
+description = "Format window/groupbar titles"
 authors = ["semigarden"]
 output = "build/hyprtab.so"
 build = [
