@@ -4,19 +4,10 @@ Hyprland plugin for formatting window titles
 
 ## Config
 
-Path:
+`default` `tab` `app` `class` `initialTitle` `initialClass`
 
-- `~/.config/hypr/plugins/hyprtab.conf`
+```
+# ~/.config/hypr/plugins/hyprtab.conf
 
-Key:
-
-- `format = "..."`
-
-Variables:
-
-- `{default}`
-- `{tab}`
-- `{app}`
-- `{class}`
-- `{initialTitle}`
-- `{initialClass}`
+format = "{app}"
+```
