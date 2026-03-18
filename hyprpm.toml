@@ -1,0 +1,12 @@
+[repository]
+name = "hyprtab"
+authors = ["semigarden"]
+
+[hyprtab]
+description = "Format Hyprland window titles"
+authors = ["semigarden"]
+output = "build/hyprtab.so"
+build = [
+    "cmake -S . -B build",
+    "cmake --build build -j"
+]

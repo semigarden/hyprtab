@@ -1,4 +1,4 @@
-# hyprtab
+# Hyprtab
 
 Hyprland plugin for formatting window titles
 

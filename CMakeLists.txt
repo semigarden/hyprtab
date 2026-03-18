@@ -26,3 +26,7 @@ set_target_properties(hyprtab PROPERTIES
     PREFIX ""
     OUTPUT_NAME "hyprtab"
 )
+
+install(TARGETS hyprtab
+    LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/hyprland/plugins"
+)
