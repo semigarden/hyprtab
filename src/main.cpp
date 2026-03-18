@@ -222,7 +222,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     rewriteExistingWindows();
     HyprlandAPI::addNotification(PHANDLE, "[hyprtab] Loaded", CHyprColor{0.2, 0.8, 0.3, 1.0}, 2500);
 
-    return {"hyprtab", "Groupbar title formatter", "hyprtab", "0.0.2"};
+    return {"hyprtab", "Window title formatter", "hyprtab", "0.0.2"};
 }
 
 APICALL EXPORT void PLUGIN_EXIT() {
