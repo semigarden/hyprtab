@@ -1,6 +1,14 @@
 # Hyprtab
 
-Hyprland plugin for formatting window titles
+Hyprland plugin to format window titles
+
+## Install
+
+```
+hyprpm add https://github.com/semigarden/hyprtab
+
+hyprpm enable hyprtab
+```
 
 ## Config
 
@@ -9,5 +17,6 @@ Hyprland plugin for formatting window titles
 ```
 # ~/.config/hypr/plugins/hyprtab.conf
 
-format = "{app}"
+format = "{tab}"
 ```
+
