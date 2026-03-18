@@ -2,6 +2,10 @@
 
 Hyprland plugin to format window titles
 
+<p align="center">
+  <img src="app/public/hyprtab.gif" alt="Hyprtab" />
+</p>
+
 ## Install
 
 ```
