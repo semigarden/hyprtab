@@ -1,6 +1,7 @@
 #include <hyprland/src/plugins/PluginAPI.hpp>
 #include <hyprland/src/event/EventBus.hpp>
 #include <hyprland/src/Compositor.hpp>
+#include <hyprland/src/desktop/state/WindowState.hpp>
 #include <hyprland/src/desktop/view/Window.hpp>
 #include <hyprland/src/managers/eventLoop/EventLoopManager.hpp>
 #include <hyprland/src/render/Renderer.hpp>
@@ -222,9 +223,9 @@ static bool rewriteTitle(PHLWINDOW window) {
 }
 
 static void rewriteExistingWindows(bool refreshMetadata = false) {
-    if (!g_pCompositor) return;
+    const auto& windows = Desktop::windowState()->windows();
 
-    for (const auto& window : g_pCompositor->m_windows) {
+    for (const auto& window : windows) {
         if (refreshMetadata && window)
             window->onUpdateMeta();
 
@@ -366,7 +367,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     rewriteExistingWindows(true);
     HyprlandAPI::addNotification(PHANDLE, "[Hyprtab] Loaded", CHyprColor{0.2, 0.8, 0.3, 1.0}, 2500);
 
-    return {"hyprtab", "Format window titles", "hyprtab", "0.0.4"};
+    return {"hyprtab", "Format window titles", "hyprtab", "0.0.5"};
 }
 
 APICALL EXPORT void PLUGIN_EXIT() {

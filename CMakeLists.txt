@@ -10,41 +10,14 @@ add_library(hyprtab MODULE
     src/main.cpp
 )
 
-set(HYPRTAB_INCLUDE_DIRS)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(deps REQUIRED IMPORTED_TARGET
+    hyprland
+    libdrm
+    pixman-1
+)
 
-if (EXISTS "/usr/include/pixman-1")
-    list(APPEND HYPRTAB_INCLUDE_DIRS "/usr/include/pixman-1")
-endif()
-
-if (EXISTS "/usr/local/include/pixman-1")
-    list(APPEND HYPRTAB_INCLUDE_DIRS "/usr/local/include/pixman-1")
-endif()
-
-if (EXISTS "/usr/include/libdrm")
-    list(APPEND HYPRTAB_INCLUDE_DIRS "/usr/include/libdrm")
-endif()
-
-if (EXISTS "/usr/local/include/libdrm")
-    list(APPEND HYPRTAB_INCLUDE_DIRS "/usr/local/include/libdrm")
-endif()
-
-if (EXISTS "/usr/include/hyprland/protocols")
-    list(APPEND HYPRTAB_INCLUDE_DIRS "/usr/include/hyprland/protocols")
-endif()
-
-if (EXISTS "/usr/include/hyprland/src")
-    list(APPEND HYPRTAB_INCLUDE_DIRS "/usr/include/hyprland/src")
-endif()
-
-if (EXISTS "/usr/local/include/hyprland/protocols")
-    list(APPEND HYPRTAB_INCLUDE_DIRS "/usr/local/include/hyprland/protocols")
-endif()
-
-if (EXISTS "/usr/local/include/hyprland/src")
-    list(APPEND HYPRTAB_INCLUDE_DIRS "/usr/local/include/hyprland/src")
-endif()
-
-target_include_directories(hyprtab PRIVATE ${HYPRTAB_INCLUDE_DIRS})
+target_link_libraries(hyprtab PRIVATE PkgConfig::deps)
 
 target_compile_options(hyprtab PRIVATE
     -Wall
