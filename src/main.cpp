@@ -2,7 +2,8 @@
 #include <hyprland/src/event/EventBus.hpp>
 #include <hyprland/src/Compositor.hpp>
 #include <hyprland/src/desktop/state/WindowState.hpp>
-#include <hyprland/src/desktop/view/Window.hpp>
+#include <hyprland/src/desktop/view/window/Window.hpp>
+#include <hyprland/src/workspace/HLWorkspace.hpp>
 #include <hyprland/src/managers/eventLoop/EventLoopManager.hpp>
 #include <hyprland/src/render/Renderer.hpp>
 
@@ -130,9 +131,9 @@ static std::string formatTitle(const STitleParts& parts, PHLWINDOW window) {
     replaceAll(formatted, "{default}", parts.full);
     replaceAll(formatted, "{tab}", parts.tab);
     replaceAll(formatted, "{app}", parts.app);
-    replaceAll(formatted, "{class}", window ? window->m_class : "");
-    replaceAll(formatted, "{initialTitle}", window ? window->m_initialTitle : "");
-    replaceAll(formatted, "{initialClass}", window ? window->m_initialClass : "");
+    replaceAll(formatted, "{class}", window ? window->metadata().appID() : "");
+    replaceAll(formatted, "{initialTitle}", window ? window->metadata().initialTitle() : "");
+    replaceAll(formatted, "{initialClass}", window ? window->metadata().initialAppID() : "");
 
     formatted = trim(std::move(formatted));
 
@@ -204,33 +205,33 @@ static void loadConfig() {
 static bool rewriteTitle(PHLWINDOW window) {
     if (!window) return false;
 
-    const std::string source = window->fetchTitle().empty() ? window->m_title : window->fetchTitle();
+    const std::string backendTitle = window->backend().metadata().title;
+    const std::string source = backendTitle.empty() ? window->metadata().title() : backendTitle;
 
     if (source.empty()) return false;
 
     const STitleParts parts = splitTitle(source);
     const std::string cleaned = formatTitle(parts, window);
 
-    if (cleaned.empty() || cleaned == window->m_title) return false;
+    if (cleaned.empty() || cleaned == window->metadata().title()) return false;
 
-    window->m_title = cleaned;
-    window->updateWindowDecos();
+    // metadata() is const; updateTitle is the compositor's title mutator.
+    const_cast<Desktop::View::CWindowMetadata&>(window->metadata()).updateTitle(cleaned);
     window->updateToplevel();
+
+    if (window->m_workspace)
+        window->m_workspace->updateWindowDecos();
 
     if (g_pHyprRenderer) g_pHyprRenderer->damageWindow(window, true);
 
     return true;
 }
 
-static void rewriteExistingWindows(bool refreshMetadata = false) {
+static void rewriteExistingWindows() {
     const auto& windows = Desktop::windowState()->windows();
 
-    for (const auto& window : windows) {
-        if (refreshMetadata && window)
-            window->onUpdateMeta();
-
+    for (const auto& window : windows)
         rewriteTitle(window);
-    }
 }
 
 static void watchConfigAndReload() {
@@ -254,7 +255,7 @@ static void watchConfigAndReload() {
     if (mtime != *g_configMtime) {
         g_configMtime = mtime;
         loadConfig();
-        rewriteExistingWindows(true);
+        rewriteExistingWindows();
     }
 }
 
@@ -360,11 +361,11 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     g_windowOpenListener  = Event::bus()->m_events.window.open.listen([](PHLWINDOW window) { rewriteTitle(window); });
     g_configReloadedListener = Event::bus()->m_events.config.reloaded.listen([]() {
         loadConfig();
-        rewriteExistingWindows(true);
+        rewriteExistingWindows();
     });
     setupConfigWatcher();
 
-    rewriteExistingWindows(true);
+    rewriteExistingWindows();
     HyprlandAPI::addNotification(PHANDLE, "[Hyprtab] Loaded", CHyprColor{0.2, 0.8, 0.3, 1.0}, 2500);
 
     return {"hyprtab", "Format window titles", "hyprtab", "0.0.5"};
